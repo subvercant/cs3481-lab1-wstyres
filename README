@@ -1,0 +1,10 @@
+Type:
+make
+to compile and link the code.
+Type
+make run
+or
+make
+./lab1
+to run the tests.
+
