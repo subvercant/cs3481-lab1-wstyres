@@ -264,9 +264,7 @@ uint8_t Tools::sign(uint64_t source)
  */
 bool Tools::addOverflow(uint64_t op1, uint64_t op2)
 {
-  printf("First Op: %llx Second Op: %llx\n", op1, op2);
   int64_t add = (int64_t)op1 + (int64_t)op2;
-  printf("Add: %016llx\n", add);
 
   if (sign(op1) == 0 && sign(op2) == 0 && sign(add) == 0) {
     return false;

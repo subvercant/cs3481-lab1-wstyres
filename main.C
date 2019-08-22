@@ -303,7 +303,7 @@ void subOverflowTests()
 
    /* Add four more tests.  See lab directions. */
    assert(Tools::subOverflow(0b1, 0xffffffffffffffff) == false);
-   assert(Tools::subOverflow(0b1, 0xefffffffffffffff) == true);
-   assert(Tools::subOverflow(0xfffffffffffffffe, 0xffffffffffffffff) == false);
+   assert(Tools::subOverflow(0x8000000000000000, 0b1) == true);
+   assert(Tools::subOverflow(0xfffffffffffffffe, 0b1) == false);
    assert(Tools::subOverflow(0xfffffffffffffffe, 0xffffffffffffffff) == false);
 }
