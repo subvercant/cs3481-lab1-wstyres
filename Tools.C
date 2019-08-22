@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <string>
 
-/** 
+/**
  * builds a 64-bit long out of an array of 8 bytes
  *
  * for example, suppose bytes[0] == 0x12
@@ -22,13 +22,23 @@
 */
 uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE])
 {
-   return 0;
+    uint64_t longboi = 0x0000000000000000;
+
+    for (int i = sizeof(bytes) - 1; i >= 0; i--) {
+      longboi = longboi + bytes[i];
+
+      if (i != 0) { //don't need to shift on the last round
+        longboi = longboi << 8;
+      }
+    }
+
+    return longboi;
 }
 
-/** 
+/**
  * accepts as input an uint64_t and returns the designated byte
  * within the uint64_t; returns 0 if the indicated byte number
- * is out of range 
+ * is out of range
  *
  * for example, getByte(0x1122334455667788, 7) returns 0x11
  *              getByte(0x1122334455667788, 1) returns 0x77
@@ -41,32 +51,52 @@ uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE])
 */
 uint64_t Tools::getByte(uint64_t source, int32_t byteNum)
 {
-   return 0;
+    if (byteNum >= 0 && byteNum <= 7) {
+      uint64_t src = source;
+      uint64_t mask = 0b11111111;
+
+      for (int i = 0; i < byteNum; i++) {
+        src = src >> 8;
+      }
+
+      return src & mask;
+    }
+    else {
+      return 0;
+    }
 }
 
 /**
- * accepts as input an uint64_t and returns the bits low through 
+ * accepts as input an uint64_t and returns the bits low through
  * high of the uint64_t.  bit 0 is the low order bit and bit 63
- * is the high order bit. returns 0 if the low or high bit numbers 
+ * is the high order bit. returns 0 if the low or high bit numbers
  * are out of range
  *
  * for example, getBits(0x8877665544332211, 0, 7) returns 0x11
  *              getBits(0x8877665544332211, 4, 11) returns 0x21
  *              getBits(0x8877665544332211, 0, 63) returns 0x8877665544332211
  *
- * @param uint64_t source that holds the bits to be grabbed and 
+ * @param uint64_t source that holds the bits to be grabbed and
  *        returned
  * @param int32_t low that is the bit number of the lowest numbered
  *        bit to be returned
  * @param int32_t high that is the bit number of the highest numbered
  *        bit to be returned
  * @return an uint64_t that holds a subset of the source bits
- *         that is returned in the low order bits; 0 if low or high 
+ *         that is returned in the low order bits; 0 if low or high
  *         is out of range
  */
 uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
 {
-   return 0;
+  if (low < 0 || high > 63 || high < low) {
+    return 0;
+  }
+
+  uint64_t src = source;
+  src = source << (63 - high);
+  src = src >> (63 - (high - low));
+
+  return src;
 }
 
 /**
@@ -79,7 +109,7 @@ uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
  *              setBits(0x1122334455667788, 8, 64) returns 0x1122334455667788
  *                      note: 64 is out of range
  *
- * @param uint64_t source 
+ * @param uint64_t source
  * @param int32_t low that is the bit number of the lowest numbered
  *        bit to be set to 1
  * @param int32_t high that is the bit number of the highest numbered
@@ -88,7 +118,21 @@ uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high)
  */
 uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
 {
-   return 0;
+  if (low < 0 || high > 63 || high < low) {
+    return source;
+  }
+
+  int range = (high - low) + 1;
+  if (range > 63) { //if the range is 64 you want to set everything to 1
+    return 0xffffffffffffffff;
+  }
+  else {
+    uint64_t mask = (1 << range) - 1;
+    mask = mask << low;
+
+    uint64_t result = source | mask;
+    return result;
+  }
 }
 
 /**
@@ -99,7 +143,7 @@ uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
  * for example, clearBits(0x1122334455667788, 0, 7) returns 0x1122334455667700
  *              clearBits(0x1122334455667788, 8, f) returns 0x1122334455660088
  *
- * @param uint64_t source 
+ * @param uint64_t source
  * @param int32_t low that is the bit number of the lowest numbered
  *        bit to be set to 0
  * @param int32_t high that is the bit number of the highest numbered
@@ -108,23 +152,38 @@ uint64_t Tools::setBits(uint64_t source, int32_t low, int32_t high)
  */
 uint64_t Tools::clearBits(uint64_t source, int32_t low, int32_t high)
 {
-   return 0;
+  if (low < 0 || high > 63 || high < low) {
+    return source;
+  }
+
+  int range = (high - low) + 1;
+  if (range > 63) { //if the range is 64 set everything to 0
+    return 0;
+  }
+  else {
+    uint64_t mask = (1 << range) - 1;
+    mask = mask << low;
+    mask = ~mask;
+
+    uint64_t result = source & mask;
+    return result;
+  }
 }
 
 /**
  * copies length bits from the source to a destination and returns the
- * modified destination. If low bit number of the source or 
- * dest is out of range or the calculated source or dest high bit 
+ * modified destination. If low bit number of the source or
+ * dest is out of range or the calculated source or dest high bit
  * number is out of range, then the unmodified destination is returned.
  *
  * for example,
- *   copyBits(0x1122334455667788, 0x8877665544332211, 0, 0, 8) 
+ *   copyBits(0x1122334455667788, 0x8877665544332211, 0, 0, 8)
  *           returns 0x8877665544332288
- *   copyBits(0x1122334455667788, 0x8877665544332211, 0, 8, 8) 
+ *   copyBits(0x1122334455667788, 0x8877665544332211, 0, 8, 8)
  *           returns 0x8877665544338811
  *
- * @param uint64_t source 
- * @param uint64_t dest 
+ * @param uint64_t source
+ * @param uint64_t dest
  * @param int32_t srclow that is the bit number of the lowest numbered
  *        bit of the source to be copied
  * @param int32_t destlow that is the bit number of the lowest numbered
@@ -132,10 +191,18 @@ uint64_t Tools::clearBits(uint64_t source, int32_t low, int32_t high)
  * @param int32_t length that is the number of bits to be copied
  * @return uint64_t that is the modifed dest
  */
-uint64_t Tools::copyBits(uint64_t source, uint64_t dest, 
-                         int32_t srclow, int32_t dstlow, int32_t length)
+uint64_t Tools::copyBits(uint64_t source, uint64_t dest, int32_t srclow, int32_t dstlow, int32_t length)
 {
-   return 0;
+  if (srclow < 0 || dstlow < 0 || srclow > 63 || dstlow > 63 || (length - 1) + srclow > 63 || (length - 1) + dstlow > 63) {
+    return dest;
+  }
+
+  uint64_t srcBits = getBits(source, srclow, (length - 1) + srclow) << dstlow;
+  uint64_t clearedDest = clearBits(dest, dstlow, (length - 1) + dstlow);
+
+  uint64_t result = srcBits | clearedDest;
+
+  return result;
 }
 
 /**
@@ -147,14 +214,21 @@ uint64_t Tools::copyBits(uint64_t source, uint64_t dest,
  *              setByte(0x1122334455667788, 1) returns 0x112233445566ff88
  *              setByte(0x1122334455667788, 8) returns 0x1122334455667788
  *
- * @param uint64_t source 
+ * @param uint64_t source
  * @param int32_t byteNum that indicates the number of the byte to be
  *        set to 0xff; the low order byte is byte number 0
  * @return uint64_t that is source with byte byteNum set to 0xff
  */
 uint64_t Tools::setByte(uint64_t source, int32_t byteNum)
 {
-   return 0;
+   if (byteNum < 0 || byteNum > 7) {
+     return source;
+   }
+
+   uint64_t mask = ((unsigned uint64_t)0b11111111 << (int)byteNum * 8);
+   uint64_t result = source | mask;
+
+   return result;
 }
 
 /**
@@ -166,12 +240,12 @@ uint64_t Tools::setByte(uint64_t source, int32_t byteNum)
  *              sign(0x8000000000000000) returns 1
  *
  * @param uint64_t source
- * @return 1 if source is negative when treated as a two's complement 
+ * @return 1 if source is negative when treated as a two's complement
  *         value and 0 otherwise
  */
 uint8_t Tools::sign(uint64_t source)
 {
-   return 0;
+   return getBits(source, 63, 63);
 }
 
 /**
@@ -190,7 +264,18 @@ uint8_t Tools::sign(uint64_t source)
  */
 bool Tools::addOverflow(uint64_t op1, uint64_t op2)
 {
-   return 0;
+  printf("First Op: %llx Second Op: %llx\n", op1, op2);
+  int64_t add = (int64_t)op1 + (int64_t)op2;
+  printf("Add: %016llx\n", add);
+
+  if (sign(op1) == 0 && sign(op2) == 0 && sign(add) == 0) {
+    return false;
+  }
+  else if (sign(op1) == 1 && sign(op2) == 1 && sign(add) == 1) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -209,6 +294,14 @@ bool Tools::addOverflow(uint64_t op1, uint64_t op2)
  */
 bool Tools::subOverflow(uint64_t op1, uint64_t op2)
 {
-   return 0;
-}
+  int64_t sub = (int64_t)op2 - (int64_t)op1;
 
+  if (sign(op1) == 0 && sign(op2) == 1 && sign(sub) == 0) {
+    return true;
+  }
+  else if (sign(op1) == 1 && sign(op2) == 0 && sign(sub) == 1) {
+    return true;
+  }
+
+  return false;
+}

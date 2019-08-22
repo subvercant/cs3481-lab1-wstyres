@@ -17,7 +17,7 @@ void signTests();
 void addOverflowTests();
 void subOverflowTests();
 
-/* If you implement the Tools in an order different from 
+/* If you implement the Tools in an order different from
  * how the tests are performed, you can reorder the tests.
  * The assert will stop execution at the first assert that
  * fails and report the line number of the failed assert.
@@ -34,12 +34,12 @@ int main(int argc, char * argv[])
    std::cout << "setBits tests pass.\n";
    clearBitsTests();
    std::cout << "clearBits tests pass.\n";
-   copyBitsTests();
-   std::cout << "copyBits tests pass.\n";
-   setByteTests();
-   std::cout << "setByte tests pass.\n";
    signTests();
    std::cout << "sign tests pass.\n";
+   setByteTests();
+   std::cout << "setByte tests pass.\n";
+   copyBitsTests();
+   std::cout << "copyBits tests pass.\n";
    addOverflowTests();
    std::cout << "addOverflow tests pass.\n";
    subOverflowTests();
@@ -48,13 +48,13 @@ int main(int argc, char * argv[])
    std::cout << "\nCongratulations!  All tests have passed.\n\n";
 }
 
-/** 
+/**
  * tests the buildLong method in the Tools class.
  *
  * buildLong takes an array of unsigned chars (uint8_t)
  * and returns an unsigned long (uint64_t) built from
  * the bytes in the array ordering such that the low
- * order byte is the 0th element of the array 
+ * order byte is the 0th element of the array
  * uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE]);
 */
 void buildLongTests()
@@ -84,7 +84,7 @@ void buildLongTests()
 /**
  * tests the getByte method in the Tools class
  *
- * getByte takes an uint64_t as input that is the source 
+ * getByte takes an uint64_t as input that is the source
  * and an int32_t containing a byte number in the range 0 to 7.
  * getByte returns the numbered byte from the source. If the byte number
  * is out of range, getByte returns 0.
@@ -119,7 +119,7 @@ void getByteTests()
  * getBits accepts as input an uint64_t and two ints that
  * indicate a range of bits to grab andreturns the bits
  * low through * high of the uint64_t.  bit 0 is the low order bit
- * and bit 63 is the high order bit. returns 0 if the low or 
+ * and bit 63 is the high order bit. returns 0 if the low or
  * high bit numbers are out of range
  * uint64_t Tools::getBits(uint64_t source, int32_t low, int32_t high);
 */
@@ -174,7 +174,7 @@ void setBitsTests()
  * tests the clearBits method in the Tools class
  *
  * clearBits sets the bits of source in the range low
- * to high to 0 (clears them) and returns that value. 
+ * to high to 0 (clears them) and returns that value.
  * returns source if the low or high
  * bit numbers are out of range
  * uint64_t Tools::clearBits(uint64_t source, int32_t low, int32_t high)
@@ -214,7 +214,7 @@ void copyBitsTests()
           == 0x9877665544332211);
    assert(Tools::copyBits(0x1122334455667788, 0x1877665544332211, 3, 0x40, 1)
           == 0x1877665544332211);
-   assert(Tools::copyBits(0x1122334455667788, 0x1877665544332211, 0xfffffffe, 
+   assert(Tools::copyBits(0x1122334455667788, 0x1877665544332211, 0xfffffffe,
           0x3f, 1) ==  0x1877665544332211);
    assert(Tools::copyBits(0x1122334455667788, 0x1877665544332211, 3, 0x3f, 2)
           == 0x1877665544332211);
@@ -271,8 +271,8 @@ void signTests()
 /**
  * tests the addOverflow method in the Tools class
  *
- * addOverflow assumes that op1 and op2 contain 64 bit two's 
- * complement values and returns true if an overflow would 
+ * addOverflow assumes that op1 and op2 contain 64 bit two's
+ * complement values and returns true if an overflow would
  * occur if they are summed and false otherwise
  * bool Tools::addOverflow(uint64_t op1, uint64_t op2)
 */
@@ -282,13 +282,17 @@ void addOverflowTests()
    assert(Tools::addOverflow(0x8000000000000000, 0x8000000000000000) == true);
 
    /* Add four more tests.  See lab directions. */
+   assert(Tools::addOverflow(0b1, 0x7fffffffffffffff) == true);
+   assert(Tools::addOverflow(0b1, 0x7ffffffffffffffe) == false);
+   assert(Tools::addOverflow(0xffffffffffffffff, 0xeffffffffffffff) == true);
+   assert(Tools::addOverflow(0xffffffffffffffff, -1) == false);
 }
 
 /**
  * tests the subOverflow method in the Tools class
  *
- * subOverflow assumes that op1 and op2 contain 64 bit two's 
- * complement values and returns true if an overflow would occur 
+ * subOverflow assumes that op1 and op2 contain 64 bit two's
+ * complement values and returns true if an overflow would occur
  * from op2 - op1 and false otherwise
  * bool Tools::subOverflow(uint64_t op1, uint64_t op2)
 */
@@ -298,4 +302,8 @@ void subOverflowTests()
    assert(Tools::subOverflow(0x0000000000000004, 0x8000000000000003) == true);
 
    /* Add four more tests.  See lab directions. */
+   assert(Tools::subOverflow(0b1, 0xffffffffffffffff) == false);
+   assert(Tools::subOverflow(0b1, 0xefffffffffffffff) == true);
+   assert(Tools::subOverflow(0xfffffffffffffffe, 0xffffffffffffffff) == false);
+   assert(Tools::subOverflow(0xfffffffffffffffe, 0xffffffffffffffff) == false);
 }
