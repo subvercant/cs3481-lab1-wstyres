@@ -216,10 +216,10 @@ uint64_t Tools::setByte(uint64_t source, int32_t byteNum)
      return source;
    }
 
-   uint64_t mask = ((unsigned uint64_t)0b11111111 << (int)byteNum * 8);
-   uint64_t result = source | mask;
+   int32_t low = byteNum * 8;
+   int32_t high = low + 7;
 
-   return result;
+   return setBits(source, low, high);
 }
 
 /**
