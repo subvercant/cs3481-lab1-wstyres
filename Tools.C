@@ -51,19 +51,10 @@ uint64_t Tools::buildLong(uint8_t bytes[LONGSIZE])
 */
 uint64_t Tools::getByte(uint64_t source, int32_t byteNum)
 {
-    if (byteNum >= 0 && byteNum <= 7) {
-      uint64_t src = source;
-      uint64_t mask = 0b11111111;
+    int32_t low = byteNum * 8;
+    int32_t high = low + 7;
 
-      for (int i = 0; i < byteNum; i++) {
-        src = src >> 8;
-      }
-
-      return src & mask;
-    }
-    else {
-      return 0;
-    }
+    return getBits(source, low, high);
 }
 
 /**
