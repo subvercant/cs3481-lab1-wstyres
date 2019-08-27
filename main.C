@@ -284,8 +284,8 @@ void addOverflowTests()
    /* Add four more tests.  See lab directions. */
    assert(Tools::addOverflow(0b1, 0x7fffffffffffffff) == true);
    assert(Tools::addOverflow(0b1, 0x7ffffffffffffffe) == false);
-   assert(Tools::addOverflow(0xffffffffffffffff, 0xeffffffffffffff) == true);
-   assert(Tools::addOverflow(0xffffffffffffffff, -1) == false);
+   assert(Tools::addOverflow(0xffffffffffffffff, 0x8000000000000000) == true);
+   assert(Tools::addOverflow(0xffffffffffffffff, 0x8000000000000001) == false);
 }
 
 /**
@@ -302,8 +302,8 @@ void subOverflowTests()
    assert(Tools::subOverflow(0x0000000000000004, 0x8000000000000003) == true);
 
    /* Add four more tests.  See lab directions. */
-   assert(Tools::subOverflow(0b1, 0xffffffffffffffff) == false);
-   assert(Tools::subOverflow(0x8000000000000000, 0b1) == true);
-   assert(Tools::subOverflow(0xfffffffffffffffe, 0b1) == false);
-   assert(Tools::subOverflow(0xfffffffffffffffe, 0xffffffffffffffff) == false);
+   assert(Tools::subOverflow(0x1, 0x8000000000000000) == true);
+   assert(Tools::subOverflow(0x1, 0xffffffffffffffff) == false);
+   assert(Tools::subOverflow(0xfffffffffffffffe, 0x7ffffffffffffffe) == true);
+   assert(Tools::subOverflow(0xfffffffffffffffe, 0x7ffffffffffffffd) == false);
 }
